@@ -1,6 +1,7 @@
 package com.gallapillo.weather
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Resources
 
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.text.TextUtils.isEmpty
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.lifecycle.Observer
@@ -17,6 +19,8 @@ import com.gallapillo.weather.viewmodel.WeatherViewModel
 import com.gallapillo.weather.viewmodel.WeatherViewModelFactory
 import com.gallapillo.weather.z_utils.COUNTRIES
 import kotlinx.android.synthetic.main.activity_main.*
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
@@ -32,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         var city = "Novosibirsk"
+
 
         loadWeather(city) {
         }
@@ -52,6 +57,7 @@ class MainActivity : AppCompatActivity() {
                 ed_choose_city.visibility = View.INVISIBLE
                 btn_city_add.visibility = View.INVISIBLE
                 loadWeather(city) {  }
+                hideKeyboard()
             } else {
                 Toast.makeText(this, "Please enter your city", Toast.LENGTH_LONG).show()
             }
@@ -83,6 +89,14 @@ class MainActivity : AppCompatActivity() {
                 // address
                 tv_address.text = weatherResponse.body()?.name
 
+                // time
+                val sdf = SimpleDateFormat("dd MMMM HH:mm", Locale.ENGLISH)
+                val currentDate = sdf.format(Date())
+
+                tv_updated_at.text = "Updated at: $currentDate"
+                tv_sunrise.text = weatherResponse.body()?.sys?.sunrise?.let { convertSunsetDate(it) }
+                tv_sunset.text = weatherResponse.body()?.sys?.sunset?.let { convertSunsetDate(it) }
+
                 // temp
                 val temp = weatherResponse.body()?.main?.temp
                 val minTemp = weatherResponse.body()?.main?.temp_min
@@ -95,8 +109,6 @@ class MainActivity : AppCompatActivity() {
                     tv_temp.text = celTemp?.toInt().toString() + "°C"
                     tv_temp_min.text = "Min Temp: " + celTempMin?.toInt().toString() + "°C"
                     tv_temp_max.text = "Max Temp: " + celTempMax?.toInt().toString() + "°C"
-
-
                 } else {
                     tv_temp.text = weatherResponse.body()?.main?.temp.toString()
                 }
@@ -110,7 +122,7 @@ class MainActivity : AppCompatActivity() {
 
                 // humidity
                 val humidity = weatherResponse.body()?.main?.humidity
-                tv_humidity.text = humidity.toString()
+                tv_humidity.text = humidity.toString() + " %"
 
                 // wind
                 val wind = weatherResponse.body()?.wind?.speed
@@ -129,5 +141,29 @@ class MainActivity : AppCompatActivity() {
 
     private fun hpaToMmHg(pressure: Int): Double {
         return pressure / 1.333
+    }
+
+    // for data utils
+
+    private val simpleDateFormat = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale.ENGLISH)
+
+    fun testDate(): String {
+        val time = 1560507488
+        return getDateString(time) // 14 June 2019, 13:18:08
+    }
+
+    fun convertSunsetDate(timeStamp: Int): String {
+        val sunsetDateFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+        return sunsetDateFormat.format(timeStamp * 1000L)
+    }
+
+    private fun getDateString(time: Long) : String = simpleDateFormat.format(time * 1000L)
+
+    private fun getDateString(time: Int) : String = simpleDateFormat.format(time * 1000L)
+
+    fun hideKeyboard() {
+        val imm: InputMethodManager = this.getSystemService(Context.INPUT_METHOD_SERVICE)
+                as InputMethodManager
+        imm.hideSoftInputFromWindow(this.window.decorView.windowToken, 0)
     }
 }
