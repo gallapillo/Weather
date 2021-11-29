@@ -13,4 +13,11 @@
     <color name="start_gradient">#9561A1</color>
     <color name="end_gradient">#122259</color>
 
+    <!-- color for start gradient temp -->
+    <color name="cool">#0fa8b0</color>
+    <color name="hot">#b00000</color>
+    <color name="pre_warm">#0ba58e</color>
+    <color name="cold">#21708e</color>
+    <color name="warmer">#b74d02</color>
+    <color name="warm">#52a060</color>
 </resources>

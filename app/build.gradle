@@ -9,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId "com.gallapillo.weather"
-        minSdkVersion 22
+        minSdkVersion 20
         targetSdkVersion 30
         versionCode 1
-        versionName "1.1"
+        versionName "1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

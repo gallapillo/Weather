@@ -2,12 +2,10 @@ package com.gallapillo.weather
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
-import android.text.TextUtils.isEmpty
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
@@ -18,16 +16,22 @@ import com.gallapillo.weather.repository.WeatherRepository
 import com.gallapillo.weather.viewmodel.WeatherViewModel
 import com.gallapillo.weather.viewmodel.WeatherViewModelFactory
 import com.gallapillo.weather.z_utils.COUNTRIES
+import com.gallapillo.weather.z_utils.DataConverter.convertSunsetDate
+import com.gallapillo.weather.z_utils.PressureConverter.hpaToMmHg
+import com.gallapillo.weather.z_utils.TemperatureConverter.kelvinToCel
 import kotlinx.android.synthetic.main.activity_main.*
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.roundToInt
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: WeatherViewModel
     private var isKelvin: Boolean = false
     private var isHpa: Boolean = false
+    private var isRound: Boolean = true
 
 
     @SuppressLint("SetTextI18n")
@@ -63,6 +67,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        tv_temp.setOnLongClickListener {
+            isRound = !isRound
+            loadWeather(city) {  }
+            return@setOnLongClickListener true
+        }
+
+        ll_pressure.setOnClickListener {
+            isHpa = !isHpa
+            loadWeather(city) {  }
+        }
+
         swiperefresh.setOnRefreshListener {
             loadWeather(city) {
                 swiperefresh.isRefreshing = false
@@ -89,6 +104,8 @@ class MainActivity : AppCompatActivity() {
                 // address
                 tv_address.text = weatherResponse.body()?.name
 
+
+
                 // time
                 val sdf = SimpleDateFormat("dd MMMM HH:mm", Locale.ENGLISH)
                 val currentDate = sdf.format(Date())
@@ -101,14 +118,25 @@ class MainActivity : AppCompatActivity() {
                 val temp = weatherResponse.body()?.main?.temp
                 val minTemp = weatherResponse.body()?.main?.temp_min
                 val maxTemp = weatherResponse.body()?.main?.temp_max
-
                 if (!isKelvin) {
                     val celTemp = temp?.let { kelvinToCel(it) }
                     val celTempMin = minTemp?.let { kelvinToCel(it) }
                     val celTempMax = maxTemp?.let { kelvinToCel(it) }
-                    tv_temp.text = celTemp?.toInt().toString() + "°C"
-                    tv_temp_min.text = "Min Temp: " + celTempMin?.toInt().toString() + "°C"
-                    tv_temp_max.text = "Max Temp: " + celTempMax?.toInt().toString() + "°C"
+
+                    //
+                    celTemp?.let { toggleColorGradientTemperature(it) }
+                    //
+                    if (isRound) {
+                        tv_temp.text = celTemp?.toInt().toString() + "°C"
+                        tv_temp_min.text = "Min Temp: " + celTempMin?.toInt().toString() + "°C"
+                        tv_temp_max.text = "Max Temp: " + celTempMax?.toInt().toString() + "°C"
+                    } else {
+
+                        tv_temp.text = celTemp?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + "°C"
+                        tv_temp_min.text = "Min Temp: " + celTempMin?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + "°C"
+                        tv_temp_max.text = "Max Temp: " + celTempMax?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + "°C"
+                    }
+
                 } else {
                     tv_temp.text = weatherResponse.body()?.main?.temp.toString()
                 }
@@ -118,6 +146,8 @@ class MainActivity : AppCompatActivity() {
                 if (!isHpa) {
                     val mmHgPressure = pressure?.let { hpaToMmHg(pressure) }
                     tv_pressure.text = mmHgPressure?.toInt().toString() + " mmHg"
+                } else {
+                    tv_pressure.text = pressure?.toInt().toString() + " Hpa"
                 }
 
                 // humidity
@@ -135,35 +165,30 @@ class MainActivity : AppCompatActivity() {
         onSuccess()
     }
 
-    private fun kelvinToCel(temp: Double): Double {
-        return temp - 273.15
-    }
-
-    private fun hpaToMmHg(pressure: Int): Double {
-        return pressure / 1.333
-    }
-
-    // for data utils
-
-    private val simpleDateFormat = SimpleDateFormat("dd MMMM yyyy, HH:mm:ss", Locale.ENGLISH)
-
-    fun testDate(): String {
-        val time = 1560507488
-        return getDateString(time) // 14 June 2019, 13:18:08
-    }
-
-    fun convertSunsetDate(timeStamp: Int): String {
-        val sunsetDateFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
-        return sunsetDateFormat.format(timeStamp * 1000L)
-    }
-
-    private fun getDateString(time: Long) : String = simpleDateFormat.format(time * 1000L)
-
-    private fun getDateString(time: Int) : String = simpleDateFormat.format(time * 1000L)
-
-    fun hideKeyboard() {
+    private fun hideKeyboard() {
         val imm: InputMethodManager = this.getSystemService(Context.INPUT_METHOD_SERVICE)
                 as InputMethodManager
         imm.hideSoftInputFromWindow(this.window.decorView.windowToken, 0)
+    }
+
+    private fun toggleColorGradientTemperature(temp: Double) {
+
+        // Toast.makeText(this, "Color Temp $temp", Toast.LENGTH_LONG).show()
+        if (temp < 0) {
+          rl_root_container.setBackgroundResource(R.drawable.cold_night_gradient)
+        } else if (temp > 0 && temp < 6) {
+            // Toast.makeText(this, "Update color starts", Toast.LENGTH_LONG).show()
+            rl_root_container.setBackgroundResource(R.drawable.second_gradient)
+        } else if (temp > 6 && temp < 12) {
+            rl_root_container.setBackgroundResource(R.drawable.pre_warm_night_gradient)
+        } else if (temp > 12 && temp < 19) {
+            rl_root_container.setBackgroundResource(R.drawable.warm_night_gradient)
+        } else if (temp < 26 && temp > 18) {
+            rl_root_container.setBackgroundResource(R.drawable.warmer_night_gradient)
+        } else if (temp > 26) {
+            rl_root_container.setBackgroundResource(R.drawable.hot_night_gradient)
+        } else {
+            rl_root_container.setBackgroundResource(R.drawable.gradient)
+        }
     }
 }
