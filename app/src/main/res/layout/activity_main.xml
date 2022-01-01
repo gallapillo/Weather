@@ -208,10 +208,12 @@
                     <Space android:layout_width="10dp"
                         android:layout_height="wrap_content"/>
                     <LinearLayout
+                        android:id="@+id/ll_wind"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_weight="1"
+                        android:clickable="true"
                         android:gravity="center"
                         android:padding="8dp"
                         android:background="@drawable/round_bg">

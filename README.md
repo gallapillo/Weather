@@ -30,3 +30,9 @@ This very lightest client weather. It works at android 5 (sdk 20)
     - minimum android now on android 5 sdk 20 earlier (android 5.1 sdk 21) 
     - fixed bugs
     - added 100 city in autocomplete
+
+## version 1.3
+    - save city when you chose
+    - added 100 city in autocomplete
+    - added a chose wind speed metric messaures (mph or m/s)
+    - added toggle a temperature and pressure

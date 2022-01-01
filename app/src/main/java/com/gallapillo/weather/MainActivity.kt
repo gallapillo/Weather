@@ -2,6 +2,7 @@ package com.gallapillo.weather
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,7 +19,10 @@ import com.gallapillo.weather.viewmodel.WeatherViewModelFactory
 import com.gallapillo.weather.z_utils.COUNTRIES
 import com.gallapillo.weather.z_utils.DataConverter.convertSunsetDate
 import com.gallapillo.weather.z_utils.PressureConverter.hpaToMmHg
+import com.gallapillo.weather.z_utils.Tags.DATA_TAG_CITY
+import com.gallapillo.weather.z_utils.Tags.PREFS_CITY
 import com.gallapillo.weather.z_utils.TemperatureConverter.kelvinToCel
+import com.gallapillo.weather.z_utils.WindConverter.msToMph
 import kotlinx.android.synthetic.main.activity_main.*
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -31,18 +35,30 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: WeatherViewModel
     private var isKelvin: Boolean = false
     private var isHpa: Boolean = false
+    private var isMph: Boolean = false
     private var isRound: Boolean = true
 
+    private lateinit var loadCity: SharedPreferences
+    private lateinit var editor : SharedPreferences.Editor
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var city = "Novosibirsk"
+        loadCity = getPreferences(Context.MODE_PRIVATE)
+        editor = loadCity.edit()
 
+        val defaultCity = "Novosibirsk"
+        var currentCity = ""
 
-        loadWeather(city) {
+        if (loadCity.getString(DATA_TAG_CITY, null) == null) {
+            editor.putString(DATA_TAG_CITY, defaultCity)
+            editor.apply()
+            loadWeather(defaultCity) { }
+        } else {
+            currentCity = loadCity.getString(DATA_TAG_CITY, null)!!
+            loadWeather(currentCity) { }
         }
 
         val cityAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, COUNTRIES)
@@ -55,31 +71,45 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn_city_add.setOnClickListener {
-            city = ed_choose_city.text.toString()
-            if (!TextUtils.isEmpty(city)) {
+            currentCity = ed_choose_city.text.toString()
+            if (!TextUtils.isEmpty(currentCity)) {
                 ll_address_container.visibility = View.VISIBLE
                 ed_choose_city.visibility = View.INVISIBLE
                 btn_city_add.visibility = View.INVISIBLE
-                loadWeather(city) {  }
+                editor.clear()
+                editor.apply()
+                editor.putString(DATA_TAG_CITY, currentCity)
+                editor.apply()
+                loadWeather(currentCity) {  }
                 hideKeyboard()
             } else {
                 Toast.makeText(this, "Please enter your city", Toast.LENGTH_LONG).show()
             }
         }
 
+        tv_temp.setOnClickListener {
+            isKelvin = !isKelvin
+            loadWeather(currentCity) {  }
+        }
+
         tv_temp.setOnLongClickListener {
             isRound = !isRound
-            loadWeather(city) {  }
+            loadWeather(currentCity) {  }
             return@setOnLongClickListener true
         }
 
         ll_pressure.setOnClickListener {
             isHpa = !isHpa
-            loadWeather(city) {  }
+            loadWeather(currentCity) {  }
+        }
+
+        ll_wind.setOnClickListener {
+            isMph = !isMph
+            loadWeather(currentCity) {  }
         }
 
         swiperefresh.setOnRefreshListener {
-            loadWeather(city) {
+            loadWeather(currentCity) {
                 swiperefresh.isRefreshing = false
             }
         }
@@ -104,8 +134,6 @@ class MainActivity : AppCompatActivity() {
                 // address
                 tv_address.text = weatherResponse.body()?.name
 
-
-
                 // time
                 val sdf = SimpleDateFormat("dd MMMM HH:mm", Locale.ENGLISH)
                 val currentDate = sdf.format(Date())
@@ -118,8 +146,9 @@ class MainActivity : AppCompatActivity() {
                 val temp = weatherResponse.body()?.main?.temp
                 val minTemp = weatherResponse.body()?.main?.temp_min
                 val maxTemp = weatherResponse.body()?.main?.temp_max
+                val celTemp = temp?.let { kelvinToCel(it) }
                 if (!isKelvin) {
-                    val celTemp = temp?.let { kelvinToCel(it) }
+
                     val celTempMin = minTemp?.let { kelvinToCel(it) }
                     val celTempMax = maxTemp?.let { kelvinToCel(it) }
 
@@ -131,14 +160,21 @@ class MainActivity : AppCompatActivity() {
                         tv_temp_min.text = "Min Temp: " + celTempMin?.toInt().toString() + "°C"
                         tv_temp_max.text = "Max Temp: " + celTempMax?.toInt().toString() + "°C"
                     } else {
-
                         tv_temp.text = celTemp?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + "°C"
                         tv_temp_min.text = "Min Temp: " + celTempMin?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + "°C"
                         tv_temp_max.text = "Max Temp: " + celTempMax?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + "°C"
                     }
-
                 } else {
-                    tv_temp.text = weatherResponse.body()?.main?.temp.toString()
+                    celTemp?.let { toggleColorGradientTemperature(it) }
+                    if (isRound) {
+                        tv_temp.text = weatherResponse.body()?.main?.temp?.toInt().toString() + " K"
+                        tv_temp_min.text = "Min Temp: " + weatherResponse.body()?.main?.temp_min?.toInt().toString() + " K"
+                        tv_temp_max.text = "Max Temp: " + weatherResponse.body()?.main?.temp_max?.toInt().toString() + " K"
+                    } else {
+                        tv_temp.text =  weatherResponse.body()?.main?.temp?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + " K"
+                        tv_temp_min.text = "Min Temp: " + weatherResponse.body()?.main?.temp_min?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + " K"
+                        tv_temp_max.text = "Max Temp: " + weatherResponse.body()?.main?.temp_max?.let { BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN).toString() } + " K"
+                    }
                 }
 
                 // pressure
@@ -156,7 +192,11 @@ class MainActivity : AppCompatActivity() {
 
                 // wind
                 val wind = weatherResponse.body()?.wind?.speed
-                tv_wind.text = wind.toString() + " m/s"
+                if (isMph) {
+                    tv_wind.text = wind?.let { msToMph(it).toString() } + " mph"
+                } else {
+                    tv_wind.text = wind.toString() + " m/s"
+                }
 
             } else {
                 tv_temp.text = weatherResponse.body().toString()
