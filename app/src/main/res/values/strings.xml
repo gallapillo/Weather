@@ -1,4 +1,20 @@
 <resources>
     <string name="app_name">Weather</string>
+    <string name="error_with_internet_connection">Error with internet connection</string>
+    <string name="try_again">try again</string>
+    <string name="choose_city_here">Choose City here..</string>
+    <string name="city">City</string>
+    <string name="data_update">Data Update</string>
+    <string name="clear_sky">Clear Sky</string>
+    <string name="_29_c">29°C</string>
+    <string name="min_temp_05_05_am">Min Temp: 05:05 AM</string>
+    <string name="max_temp_05_05_pm">Max Temp: 05:05 PM</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="_06_40_am">06:40 AM</string>
+    <string name="sunset">Sunset</string>
+    <string name="wind">Wind</string>
+    <string name="humidity">Humidity</string>
+    <string name="created_by">Created By</string>
+    <string name="gallapillo">gallapillo</string>
 
 </resources>

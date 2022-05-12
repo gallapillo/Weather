@@ -36,3 +36,9 @@ This very lightest client weather. It works at android 5 (sdk 20)
     - added 100 city in autocomplete
     - added a chose wind speed metric messaures (mph or m/s)
     - added toggle a temperature and pressure
+    
+## version 1.4
+    - save parameters e.g (pressure, wind speed, temperature mesuarement)
+    - added 100 city in autocomplete
+    - fixed check interenet connection
+    

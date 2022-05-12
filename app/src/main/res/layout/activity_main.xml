@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="25dp"
+    android:visibility="visible"
     android:id="@+id/rl_root_container"
     android:background="@drawable/gradient"
     >
@@ -15,12 +16,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
+
         <RelativeLayout
 
             android:id="@+id/rv_main_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible">
+            android:visibility="visible"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -35,7 +39,7 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/round_bg"
                     android:completionThreshold="1"
-                    android:hint="Choose City here.."
+                    android:hint="@string/choose_city_here"
                     android:lines="1"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
@@ -67,7 +71,7 @@
                     android:textColor="@color/white"
                     android:layout_height="wrap_content"
                     android:textSize="24sp"
-                    android:text="City"
+                    android:text="@string/city"
                     android:clickable="true"
 
                      />
@@ -76,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
                     android:textColor="@color/white"
-                    android:text="Data Update"/>
+                    android:text="@string/data_update"/>
             </LinearLayout>
 
 
@@ -94,7 +98,7 @@
                     android:textSize="18sp"
                     android:textColor="@color/white"
                     android:layout_gravity="center"
-                    android:text="Clear Sky"/>
+                    android:text="@string/clear_sky"/>
                 <TextView
                     android:id="@+id/tv_temp"
                     android:layout_width="wrap_content"
@@ -104,7 +108,7 @@
                     android:fontFamily="sans-serif-thin"
                     android:textColor="@color/white"
                     android:layout_gravity="center"
-                    android:text="29°C"/>
+                    android:text="@string/_29_c"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -116,7 +120,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
-                        android:text="Min Temp: 05:05 AM"/>
+                        android:text="@string/min_temp_05_05_am"/>
                     <Space android:layout_width="50dp"
                         android:layout_height="wrap_content"/>
 
@@ -125,7 +129,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
-                        android:text="Max Temp: 05:05 PM"/>
+                        android:text="@string/max_temp_05_05_pm"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -164,14 +168,14 @@
                             android:layout_height="wrap_content"
                             android:textSize="12sp"
                             android:textColor="@color/white"
-                            android:text="Sunrise"/>
+                            android:text="@string/sunrise"/>
                         <TextView
                             android:id="@+id/tv_sunrise"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/white"
-                            android:text="06:40 AM"/>
+                            android:text="@string/_06_40_am"/>
                     </LinearLayout>
                     <Space android:layout_width="10dp"
                         android:layout_height="wrap_content"/>
@@ -194,16 +198,16 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12dp"
+                            android:textSize="12sp"
                             android:textColor="@color/white"
-                            android:text="Sunset"/>
+                            android:text="@string/sunset"/>
                         <TextView
                             android:id="@+id/tv_sunset"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/white"
-                            android:text="06:40 AM"/>
+                            android:text="@string/_06_40_am"/>
                     </LinearLayout>
                     <Space android:layout_width="10dp"
                         android:layout_height="wrap_content"/>
@@ -230,14 +234,14 @@
                             android:layout_height="wrap_content"
                             android:textSize="12sp"
                             android:textColor="@color/white"
-                            android:text="Wind"/>
+                            android:text="@string/wind"/>
                         <TextView
                             android:id="@+id/tv_wind"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/white"
-                            android:text="06:40 AM"/>
+                            android:text="@string/_06_40_am"/>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -304,13 +308,13 @@
                             android:layout_height="wrap_content"
                             android:textSize="12sp"
                             android:textColor="@color/white"
-                            android:text="Humidity"/>
+                            android:text="@string/humidity"/>
                         <TextView android:id="@+id/tv_humidity"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/white"
-                            android:text="06:40 AM"/>
+                            android:text="@string/_06_40_am"/>
                     </LinearLayout>
                     <Space android:layout_width="10dp"
                         android:layout_height="wrap_content"/>
@@ -335,14 +339,14 @@
                             android:layout_height="wrap_content"
                             android:textSize="12sp"
                             android:textColor="@color/white"
-                            android:text="Created By"/>
+                            android:text="@string/created_by"/>
                         <TextView
                             android:id="@+id/about"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/white"
-                            android:text="gallapillo"/>
+                            android:text="@string/gallapillo"/>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -350,16 +354,27 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
-
-
-    <ProgressBar android:id="@+id/pb_loader" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:layout_centerInParent="true"
-        android:visibility="gone"/>
-
-    <TextView android:id="@+id/tv_error_text" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:layout_centerInParent="true"
-        android:visibility="gone" android:text="Error with internet connection"/>
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ll_error_container"
+        android:orientation="vertical"
+        android:layout_marginTop="320dp"
+        android:visibility="invisible"
+        android:gravity="center">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/error_with_internet_connection"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            />
+        <Button
+            android:id="@+id/btn_restart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/try_again"/>
+    </LinearLayout>
 
 </RelativeLayout>
